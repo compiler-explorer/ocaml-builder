@@ -9,7 +9,14 @@ RUN apt update -y -q && apt upgrade -y -q && apt update -y -q && \
     git \
     make \
     s3cmd \
-    xz-utils
+    xz-utils \
+    unzip
+
+RUN cd /tmp && \
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install && \
+    rm -rf aws*
 
 RUN mkdir -p /root
 COPY build /root/
