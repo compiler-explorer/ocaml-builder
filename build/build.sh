@@ -33,6 +33,8 @@ else
     fi
 fi
 
+echo "ce-build-output:${OUTPUT}"
+
 # Ocaml likes to put shebang lines of the form #!/path/to/ocamlrun which is set during build.
 # We can't reolcate ocaml after the build, so we build it here in its presumed final destination location
 STAGING_DIR=/opt/compiler-explorer/ocaml-${FULL_VERSION}
@@ -51,3 +53,5 @@ tar Jcf ${OUTPUT} --transform "s,^./,./ocaml-${FULL_VERSION}/," -C ${STAGING_DIR
 if [[ -n "${S3OUTPUT}" ]]; then
     aws s3 cp --storage-class REDUCED_REDUNDANCY "${OUTPUT}" "${S3OUTPUT}"
 fi
+
+echo "ce-build-status:OK"
