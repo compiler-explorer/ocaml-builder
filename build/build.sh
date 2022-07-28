@@ -20,7 +20,8 @@ if echo ${VERSION} | grep 'trunk'; then
     exit 1
 fi
 
-OUTPUT=/root/ocaml-${FULL_VERSION}.tar.xz
+FULLNAME=ocaml-${FULL_VERSION}
+OUTPUT=/root/${FULLNAME}.tar.xz
 S3OUTPUT=
 if [[ $2 =~ ^s3:// ]]; then
     S3OUTPUT=$2
