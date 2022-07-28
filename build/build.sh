@@ -21,11 +21,15 @@ if echo ${VERSION} | grep 'trunk'; then
 fi
 
 OUTPUT=/root/ocaml-${FULL_VERSION}.tar.xz
-S3OUTPUT=""
-if echo $2 | grep s3://; then
+S3OUTPUT=
+if [[ $2 =~ ^s3:// ]]; then
     S3OUTPUT=$2
 else
-    OUTPUT=${2-/root/ocaml-${VERSION}.tar.xz}
+    if [[ -d "${2}" ]]; then
+        OUTPUT=$2/${FULLNAME}.tar.xz
+    else
+        OUTPUT=${2-$OUTPUT}
+    fi
 fi
 
 # Ocaml likes to put shebang lines of the form #!/path/to/ocamlrun which is set during build.
