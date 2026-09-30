@@ -3,17 +3,7 @@
 set -ex
 
 FULL_VERSION=$1
-IS_AUTOCONF=$3
-VERSION=${FULL_VERSION}
-FLAGS=
-if echo ${VERSION} | grep -- '-flambda'; then
-    if [[ "x$IS_AUTOCONF" -eq "xyes" ]]; then
-        FLAGS=--enable-flambda
-    else
-        FLAGS=-flambda
-    fi
-    VERSION=${VERSION%-flambda}
-fi
+VERSION=${FULL_VERSION%-flambda}
 
 if echo ${VERSION} | grep 'trunk'; then
     echo Not supported at present
@@ -43,9 +33,21 @@ mkdir -p ${STAGING_DIR}
 
 curl -L https://github.com/ocaml/ocaml/archive/${VERSION}.tar.gz | tar zxf -
 cd ocaml-${VERSION}
+if [[ -f configure.ac ]]; then
+    FLAMBDA_FLAG=--enable-flambda
+    JOBS=$(nproc)
+else
+    # Before 4.08 OCaml had a hand-written configure (only takes -flambda) and its Makefiles aren't parallel-safe
+    FLAMBDA_FLAG=-flambda
+    JOBS=1
+fi
+FLAGS=
+if [[ "${FULL_VERSION}" != "${VERSION}" ]]; then
+    FLAGS=${FLAMBDA_FLAG}
+fi
 ./configure ${FLAGS} -prefix ${STAGING_DIR}
-make -j$(nproc) world.opt
-make -j$(nproc) install
+make -j${JOBS} world.opt
+make -j${JOBS} install
 
 export XZ_DEFAULTS="-T 0"
 tar Jcf ${OUTPUT} --transform "s,^./,./ocaml-${FULL_VERSION}/," -C ${STAGING_DIR} .
